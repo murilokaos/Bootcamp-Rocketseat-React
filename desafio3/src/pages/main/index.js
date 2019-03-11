@@ -1,17 +1,32 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import MapGL, { Marker } from 'react-map-gl';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Creators as DevsActions } from '../../store/ducks/devs';
 
-import MapGL, { Marker } from 'react-map-gl';
-
-import 'mapbox-gl/dist/mapbox-gl.css';
-
-// import { Container } from './styles';
-
+import Aside from '../../components/aside';
 import Modal from '../../components/modal';
 
+import { Container } from './styles';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
 class Main extends Component {
+  static propTypes = {
+    devsInArea: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number,
+        lng: PropTypes.number,
+        lat: PropTypes.number,
+        avatar: PropTypes.string,
+        name: PropTypes.string,
+        company: PropTypes.string,
+        url: PropTypes.string,
+      }),
+    ).isRequired,
+  };
+
   state = {
     viewport: {
       width: window.innerWidth,
@@ -20,7 +35,12 @@ class Main extends Component {
       longitude: -49.3102765,
       zoom: 14,
     },
+    latitude: 0,
+    longitude: 0,
+    isModalClose: true,
   };
+
+  /* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
 
   componentDidMount() {
     window.addEventListener('resize', this._resize);
@@ -32,59 +52,86 @@ class Main extends Component {
   }
 
   _resize = () => {
+    const { viewport } = this.state;
     this.setState({
       viewport: {
-        ...this.state.viewport,
+        ...viewport,
         width: window.innerWidth,
         height: window.innerHeight,
       },
     });
   };
 
-  handleMapClick(e) {
-    const [latitude, longitude] = e.lngLat;
+  handleOpenOrNo = () => {
+    const { isModalClose } = this.state;
+    const status = this.setState({
+      isModalClose: !isModalClose,
+    });
 
-    alert(`Latitude: ${latitude} \nLongitude: ${longitude}`);
-  }
+    return status;
+  };
+
+  handleMapClick = (e) => {
+    const [longitude, latitude] = e.lngLat;
+
+    // alert(`Latitude: ${latitude} \nLongitude: ${longitude}`);
+    this.handleOpenOrNo();
+    this.setState({
+      latitude,
+      longitude,
+    });
+  };
 
   render() {
+    const {
+      viewport, isModalClose, latitude, longitude,
+    } = this.state;
+    const { devsInArea } = this.props;
     return (
-      <Fragment>
+      <Container>
+        {!isModalClose && (
+          <Modal
+            isOpen={this.handleOpenOrNo}
+            lng={longitude}
+            lat={latitude}
+            isModalClose={isModalClose}
+          />
+        )}
+        <Aside />
         <MapGL
-          {...this.state.viewport}
-          mapStyle="mapbox://styles/mapbox/basic-v9"
+          {...viewport}
+          mapStyle="mapbox://styles/mapbox/dark-v9"
           mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
-          onViewportChange={viewport => this.setState({ viewport })}
+          onViewportChange={view => this.setState({ viewport: view })}
           onClick={this.handleMapClick}
         >
-          <Marker
-            longitude={-49.3102765}
-            latitude={-16.6762391}
-            onClick={this.handleMapClick}
-            captureClick
-          >
-            <img
-              style={{
-                borderRadius: 100,
-                width: 48,
-                height: 48,
-              }}
-              src="https://avatars2.githubusercontent.com/u/2254731?v=4"
-              alt="Diego Fernandes at Rocketseat"
-            />
-          </Marker>
+          {!!devsInArea
+            && devsInArea.map(dev => (
+              <Marker key={dev.id} longitude={dev.lng} latitude={dev.lat}>
+                <img
+                  style={{
+                    borderRadius: 100,
+                    width: 48,
+                    height: 48,
+                  }}
+                  src={dev.avatar}
+                  alt={`${dev.name} ${dev.company}`}
+                />
+              </Marker>
+            ))}
         </MapGL>
-        <Modal />
-      </Fragment>
+      </Container>
     );
   }
 }
 
-// const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  devsInArea: state.devs.data,
+});
 
-// const mapDispatchToProps = dispatch =>
-//   bindActionCreators(Actions, dispatch);
+const mapDispatchToProps = dispatch => bindActionCreators(DevsActions, dispatch);
 
-export default connect()(Main);
-// mapStateToProps,
-// mapDispatchToProps
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Main);
