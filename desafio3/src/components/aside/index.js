@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+import { Creators as DevActions } from '../../store/ducks/devs';
 
 import {
   Container,
@@ -16,7 +19,7 @@ import {
   ButtonArrow,
 } from './styles';
 
-const Aside = ({ devsInArea }) => (
+const Aside = ({ devsInArea, removeDev }) => (
   <Container>
     {devsInArea.length ? (
       <List>
@@ -28,16 +31,29 @@ const Aside = ({ devsInArea }) => (
               <ListSubTitle>{dev.username}</ListSubTitle>
             </ListTitleContainer>
             <ListButtonsContainer>
-              <ButtonDelete>
+              <ButtonDelete
+                type="button"
+                onClick={() => {
+                  removeDev(dev);
+                }}
+              >
                 <i className="fa fa-fw fa-times-circle remove" />
               </ButtonDelete>
-              <ButtonArrow>{'>'}</ButtonArrow>
+              <ButtonArrow href={dev.url} target="_blank" rel="noreferrer noopener">
+                <i className="fa fa-angle-right" />
+              </ButtonArrow>
             </ListButtonsContainer>
           </ListItem>
         ))}
       </List>
     ) : (
-      <h1>puts... Não tem ninguém aqui!</h1>
+      <div>
+        <img
+          src="https://www.shareicon.net/download/2016/08/13/808566_media.svg"
+          alt="Logo Github"
+        />
+        Puts... Parece que não tem ninguém cadastrado ainda! Seja o primeiro.
+      </div>
     )}
   </Container>
 );
@@ -54,7 +70,13 @@ Aside.propTypes = {
   ).isRequired,
 };
 
-const mapStateToProps = state => ({
-  devsInArea: state.devs.data,
+const mapStateToProps = ({ devs }) => ({
+  devsInArea: devs.data,
 });
-export default connect(mapStateToProps)(Aside);
+
+const mapDispatchToProps = dispatch => bindActionCreators(DevActions, dispatch);
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Aside);

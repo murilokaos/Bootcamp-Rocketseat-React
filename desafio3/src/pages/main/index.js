@@ -10,7 +10,6 @@ import Aside from '../../components/aside';
 import Modal from '../../components/modal';
 
 import { Container } from './styles';
-import 'mapbox-gl/dist/mapbox-gl.css';
 
 class Main extends Component {
   static propTypes = {
@@ -33,7 +32,7 @@ class Main extends Component {
       height: window.innerHeight,
       latitude: -16.6762391,
       longitude: -49.3102765,
-      zoom: 14,
+      zoom: 15,
     },
     latitude: 0,
     longitude: 0,
@@ -74,7 +73,6 @@ class Main extends Component {
   handleMapClick = (e) => {
     const [longitude, latitude] = e.lngLat;
 
-    // alert(`Latitude: ${latitude} \nLongitude: ${longitude}`);
     this.handleOpenOrNo();
     this.setState({
       latitude,
@@ -115,7 +113,7 @@ class Main extends Component {
                     height: 48,
                   }}
                   src={dev.avatar}
-                  alt={`${dev.name} ${dev.company}`}
+                  alt={`${dev.name} Avatar`}
                 />
               </Marker>
             ))}
@@ -125,8 +123,8 @@ class Main extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  devsInArea: state.devs.data,
+const mapStateToProps = ({ devs }) => ({
+  devsInArea: devs.data,
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators(DevsActions, dispatch);

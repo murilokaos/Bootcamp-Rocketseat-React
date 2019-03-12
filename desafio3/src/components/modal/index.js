@@ -15,6 +15,7 @@ class Modal extends Component {
     lng: PropTypes.number.isRequired,
     lat: PropTypes.number.isRequired,
     addDevRequest: PropTypes.func.isRequired,
+    loading: PropTypes.bool.isRequired,
   };
 
   state = {
@@ -48,16 +49,21 @@ class Modal extends Component {
 
   handleSave = (e) => {
     e.preventDefault();
-    const { lng, lat, addDevRequest } = this.props;
+    const {
+      lng, lat, addDevRequest, loading,
+    } = this.props;
     const { userInput } = this.state;
 
     addDevRequest(userInput, lat, lng);
 
-    this.setClosing();
+    if (loading) return;
+
+    if (!loading) this.setClosing();
   };
 
   render() {
     const { userInput, closing } = this.state;
+    const { loading } = this.props;
     return (
       <Container close={closing} open={!closing}>
         <Board onSubmit={this.handleSave}>
@@ -76,7 +82,9 @@ class Modal extends Component {
             <Button type="button" onClick={this.handleClose}>
               Cancelar
             </Button>
-            <Button type="submit">Salvar</Button>
+            <Button type="submit">
+              {loading ? <i className="fa fa-circle-o-notch fa-spin fa-2x" /> : 'Salvar'}
+            </Button>
           </ButtonsContainer>
         </Board>
       </Container>
@@ -84,8 +92,8 @@ class Modal extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  devs: state.data,
+const mapStateToProps = ({ devs }) => ({
+  loading: devs.loading,
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators(DevsActions, dispatch);

@@ -5,6 +5,7 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  flex-wrap: wrap;
 
   max-width: 25%;
   width: calc((100% / 12) * 4);
@@ -17,8 +18,29 @@ export const Container = styled.div`
   background-color: #050806;
   box-shadow: 0 0 5px 1px limegreen;
   border-radius: 5px;
+  color: limegreen;
 
   z-index: 1;
+
+  div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    padding: 15px;
+    text-align: center;
+
+    img {
+      flex: 1;
+      width: 50%;
+      height: auto;
+      padding: 15px;
+
+      background-color: limegreen;
+      margin-bottom: 15px;
+    }
+  }
 `;
 
 export const List = styled.ul`
@@ -34,6 +56,7 @@ export const ListItem = styled.li`
   flex: 1;
   padding: 15px;
   border-bottom: 1px solid rgba(124, 252, 0, 0.5);
+  width: 100%;
 `;
 
 export const ListTitleContainer = styled.div`
@@ -64,6 +87,8 @@ export const ListSubTitle = styled.p`
 `;
 
 export const ListButtonsContainer = styled.div`
+  min-width: 25%;
+  padding: 0;
   i {
     margin-left: 10px;
   }
@@ -72,9 +97,11 @@ export const ListButtonsContainer = styled.div`
 export const ButtonDelete = styled.button`
   color: #f00;
   background: transparent;
+  cursor: pointer;
 `;
 
-export const ButtonArrow = styled.i`
-  color: #333;
+export const ButtonArrow = styled.a`
+  color: limegreen;
   font-weight: bold;
+  text-decoration: none;
 `;

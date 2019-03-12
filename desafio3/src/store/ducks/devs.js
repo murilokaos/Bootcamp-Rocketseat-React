@@ -8,6 +8,7 @@ export const Types = {
   ADD_REQUEST: 'devs/ADD_REQUEST',
   ADD_SUCCESS: 'devs/ADD_SUCCESS',
   ADD_FAILURE: 'devs/ADD_FAILURE',
+  REMOVE: 'devs/REMOVE',
   // TODO: criar os outros types
 };
 
@@ -30,7 +31,6 @@ export default function devs(state = INITIAL_STATE, action) {
       return {
         ...state,
         loading: true,
-        data: [],
         error: null,
       };
     case Types.ADD_SUCCESS:
@@ -44,8 +44,12 @@ export default function devs(state = INITIAL_STATE, action) {
       return {
         ...state,
         loading: false,
-        data: [],
         error: action.payload.error,
+      };
+    case Types.REMOVE:
+      return {
+        ...state,
+        data: state.data.filter(dev => dev.id !== action.payload.dev.id),
       };
     default:
       return state;
@@ -71,5 +75,9 @@ export const Creators = {
   addDevFailure: error => ({
     type: Types.ADD_FAILURE,
     payload: { error },
+  }),
+  removeDev: dev => ({
+    type: Types.REMOVE,
+    payload: { dev },
   }),
 };
